@@ -13,7 +13,7 @@ RUN . /app/.venv/bin/activate && \
         pydub \
         nest-asyncio \
         azure-storage-blob==12.23.1 \
-        google-generativeai  # ← THIS LINE ADDED
+        # google-generativeai  # ← THIS LINE ADDED
 
 WORKDIR /app
 
