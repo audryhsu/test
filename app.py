@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
 
 # Create FastAPI app
@@ -17,7 +17,7 @@ class GenerationResponse(BaseModel):
 # Global variable to track requests
 request_count = 0
 
-# Health check endpoint; required for Runpod to monitor worker health
+# Health check endpoint; required for RunPod to monitor worker health
 @app.get("/ping")
 async def health_check():
     return {"status": "healthy"}
@@ -28,7 +28,9 @@ async def generate(request: GenerationRequest):
     global request_count
     request_count += 1
 
-    # A simple mock implementation; we'll replace this with an actual model later
+    print(f"Received request #{request_count} with prompt: {request.prompt}")
+
+    # A simple mock implementation; replace with actual model later
     generated_text = f"Response to: {request.prompt} (request #{request_count})"
 
     return {"generated_text": generated_text}
@@ -43,7 +45,6 @@ if __name__ == "__main__":
     import uvicorn
 
     port = int(os.getenv("PORT", 80))
-    logger.info(f"Starting vLLM server on port {port}")
+    print(f"Starting server on port {port}")
 
-    # Start the server
     uvicorn.run(app, host="0.0.0.0", port=port)
