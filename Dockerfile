@@ -1,28 +1,16 @@
-FROM ghcr.io/remsky/kokoro-fastapi-gpu:latest
+FROM nvidia/cuda:12.1.0-base-ubuntu22.04 
 
-USER root
+RUN apt-get update -y \
+    && apt-get install -y python3-pip
 
-# Install pip (just in case)
-RUN apt-get update && apt-get install -y --no-install-recommends python3-pip && \
-    rm -rf /var/lib/apt/lists/*
+RUN ldconfig /usr/local/cuda-12.1/compat/
 
-# Activate venv and install ALL required packages
-RUN . /app/.venv/bin/activate && \
-    uv pip install --no-cache \
-        runpod \
-        pydub \
-        nest-asyncio \
-        azure-storage-blob==12.23.1 \
-        google-generativeai
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-WORKDIR /app
+# Copy application code
+COPY app.py .
 
-# Copy the fine-tuned homograph model files (directly from models folder in repo)
-COPY models /app/models
-
-# Copy your final private handler.py
-COPY handler.py .
-
-EXPOSE 8000
-
-CMD ["python", "-u", "handler.py"]
+# Start the handler
+CMD ["python3", "app.py"]
